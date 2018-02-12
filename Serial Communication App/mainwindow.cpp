@@ -53,8 +53,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBoxFlowControl->setCurrentText("NO"); // Указание "дефолтного" значения
 
     ui->comboBoxLineTerminator->addItem("NO"); // Заполнение настройки окончания строки
-    ui->comboBoxLineTerminator->addItem("EOL");
-    ui->comboBoxLineTerminator->setCurrentText("EOL"); // Указание "дефолтного" значения
+    ui->comboBoxLineTerminator->addItem("CR");
+    ui->comboBoxLineTerminator->addItem("LF");
+    ui->comboBoxLineTerminator->addItem("CRLF");
+    ui->comboBoxLineTerminator->addItem("LFCR");
+    ui->comboBoxLineTerminator->setCurrentText("LF"); // Указание "дефолтного" значения
 
     on_actionCOMUPD_triggered(); // Обнновить список доступных портов
 
@@ -123,7 +126,7 @@ void MainWindow::on_pushButtonAction_clicked()
             serial->setFlowControl(QSerialPort::HardwareControl);
 
         if (!serial->open(QIODevice::ReadWrite)) { // Если попытка открыть порт для ввода\вывода не получилось
-            QSerialPort::SerialPortError getError; // Ошибка открытия порта
+            QSerialPort::SerialPortError getError = QSerialPort::NoError; // Ошибка открытия порта
             serial->error(getError); // Получить номер ошибки
             emit response(tr("Can't open %1, error code %2").arg(ui->comboBoxCOM->currentText()).arg(serial->error())); // Выдать сообщение об ошибке
 
@@ -131,6 +134,8 @@ void MainWindow::on_pushButtonAction_clicked()
         }
 
         ui->pushButtonAction->setText("Disconnect"); // Перевести кнопку в режим "Отключение"
+
+        //ui->lineEditResponse->setText(""); // Опустошить строку с последним текущим ответом
     } else { // Если нам нужно отключиться
         this->serial->close(); // Закрыть открытый порт
 
@@ -143,6 +148,7 @@ void MainWindow::on_pushButtonAction_clicked()
     ui->comboBoxData->setEnabled(ui->pushButtonAction->text() == "Connect");
     ui->comboBoxParity->setEnabled(ui->pushButtonAction->text() == "Connect");
     ui->comboBoxStop->setEnabled(ui->pushButtonAction->text() == "Connect");
+    ui->comboBoxFlowControl->setEnabled(ui->pushButtonAction->text() == "Connect");
 
     // Блокировка или разблокировка кнопок отправки и приёма сообщений
     ui->comboBoxLineTerminator->setEnabled(ui->pushButtonAction->text() == "Disconnect");
@@ -153,12 +159,57 @@ void MainWindow::on_pushButtonAction_clicked()
     return;
 }
 
+void MainWindow::on_pushButtonSearch_clicked()
+{
+    ui->lineEditCommand->setText("*IDN?");
+
+    // Проверка идёт не по всем возможным настройкам для экономии времени
+
+    QStringList BaudsScan;
+    BaudsScan.push_back("9600");
+    BaudsScan.push_back("19200");
+    QStringList StopScan;
+    StopScan.push_back("1");
+    StopScan.push_back("2");
+    QStringList ParityScan;
+    ParityScan.push_back("NO");
+    ParityScan.push_back("EVEN");
+    ParityScan.push_back("ODD");
+
+    for (int baud = 0; baud < BaudsScan.length(); baud++)
+        for (int parity = 0; parity < ParityScan.length(); parity++)
+            for (int stop = 0; stop < StopScan.length(); stop++) {
+                ui->comboBoxBaud->setCurrentText(BaudsScan[baud]);
+                ui->comboBoxParity->setCurrentText(ParityScan[parity]);
+                ui->comboBoxStop->setCurrentText(StopScan[stop]);
+
+                for (int attempt = 0; attempt < 5; attempt++) {
+                    on_pushButtonAction_clicked();
+                    on_pushButtonSend_clicked();
+                    on_pushButtonAction_clicked();
+
+                    if (ui->lineEditResponse->text().contains("Stanford"))
+                        return;
+                }
+            }
+
+    ui->lineEditResponse->setText("No SRS hardware found!");
+
+    return;
+}
+
 void MainWindow::on_pushButtonSend_clicked()
 {
     QString command = ui->lineEditCommand->text(); // Получить команду из текстового поля
 
-    if (ui->comboBoxLineTerminator->currentText() == "EOL") // При необходимости добавить символ окончания строки
+    if (ui->comboBoxLineTerminator->currentText() == "CR") // При необходимости добавить символ окончания строки
+        command += "\r";
+    if (ui->comboBoxLineTerminator->currentText() == "LF") // При необходимости добавить символ окончания строки
         command += "\n";
+    if (ui->comboBoxLineTerminator->currentText() == "CRLF") // При необходимости добавить символ окончания строки
+        command += "\r\n";
+    if (ui->comboBoxLineTerminator->currentText() == "CRLF") // При необходимости добавить символ окончания строки
+        command += "\n\r";
 
     serial->write(command.toLocal8Bit()); // Передать данные по порту в битовом представлении
 

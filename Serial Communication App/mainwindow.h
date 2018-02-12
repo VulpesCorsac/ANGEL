@@ -6,6 +6,7 @@
 #include <QSerialPortInfo>
 #include <QTime>
 #include <QDebug>
+#include <QTest>
 
 namespace Ui {
     class MainWindow;
@@ -32,6 +33,8 @@ private slots:
 
     void on_pushButtonSend_clicked(); // Отправка команды
     void on_pushButtonRecieve_clicked(); // Получение ответа
+
+    void on_pushButtonSearch_clicked(); // Перебор настроек для поиска подходящих
 
     void get_response(const QString &s); // Выведение ответа или отчёта об ошибки
 

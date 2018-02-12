@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>353</width>
-    <height>314</height>
+    <height>311</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Serial App V1.1.0</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="groupBox">
@@ -239,8 +239,8 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>311</width>
-       <height>88</height>
+       <width>320</width>
+       <height>91</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -259,6 +259,13 @@
            <widget class="QComboBox" name="comboBoxLineTerminator"/>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonSearch">
+          <property name="text">
+           <string>Search</string>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -327,7 +334,7 @@
         <item>
          <widget class="QLineEdit" name="lineEditResponse">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
