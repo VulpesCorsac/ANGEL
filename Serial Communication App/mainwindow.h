@@ -18,7 +18,7 @@ class MainWindow : public QMainWindow
 
 private:
     int firstWaitTime = 500; // Первичное время ожидания новых данных, мс
-    int additionalWaitTime = 5; // Дополнительное время ожидания новых данных, мс
+    int additionalWaitTime = 10; // Дополнительное время ожидания новых данных, мс
     QSerialPort *serial; // SerialPort
     QTime time; // Для измерения времени отклика
 
