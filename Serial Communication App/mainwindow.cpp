@@ -208,7 +208,7 @@ void MainWindow::on_pushButtonSend_clicked()
         command += "\n";
     if (ui->comboBoxLineTerminator->currentText() == "CRLF") // При необходимости добавить символ окончания строки
         command += "\r\n";
-    if (ui->comboBoxLineTerminator->currentText() == "CRLF") // При необходимости добавить символ окончания строки
+    if (ui->comboBoxLineTerminator->currentText() == "LFCR") // При необходимости добавить символ окончания строки
         command += "\n\r";
 
     serial->write(command.toLocal8Bit()); // Передать данные по порту в битовом представлении
